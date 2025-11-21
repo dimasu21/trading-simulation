@@ -2,7 +2,7 @@
 
 Fun, fast-paced trading mini-game. Start with $10,000 and try to grow your portfolio within a short timed session by buying low and selling high in a volatile market.
 
-Live site: [tradegame-xi.vercel.app](https://tradegame-xi.vercel.app/)
+Live site: [tradegame-simulation-game.vercel.app](https://trading-simulation-game.vercel.app/)
 
 ### What it is
 
