@@ -1,0 +1,1881 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>TradeGame - Fun Trading Game</title>
+    <meta
+      name="description"
+      content="Master the markets in 60 seconds! TradeGame is a fun stock trading game with volatile markets, bull/bear cycles, and exciting features. Can you beat the market?"
+    />
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://tradegame.sevalla.page/" />
+    <meta property="og:title" content="TradeGame - Fun Trading Game" />
+    <meta
+      property="og:description"
+      content="Master the markets in 60 seconds! Fun stock trading game with volatile markets, bull/bear cycles, and exciting features. Challenge your friends!"
+    />
+    <meta
+      property="og:image"
+      content="https://tradegame.sevalla.page/og-image.png"
+    />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:site_name" content="TradeGame" />
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content="https://tradegame.sevalla.page/" />
+    <meta property="twitter:title" content="TradeGame - Fun Trading Game" />
+    <meta
+      property="twitter:description"
+      content="Master the markets in 60 seconds! Fun stock trading game with volatile markets, bull/bear cycles, and exciting features. Challenge your friends!"
+    />
+    <meta
+      property="twitter:image"
+      content="https://tradegame.sevalla.page/og-image.png"
+    />
+    <meta property="twitter:creator" content="@yourusername" />
+
+    <!-- Additional SEO -->
+    <meta
+      name="keywords"
+      content="trading game, stock simulator, finance game, trading simulator, stock market game, investment game, trading challenge"
+    />
+    <meta name="author" content="TradeGame" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Inter", sans-serif;
+      }
+      .gradient-bg {
+        background: linear-gradient(
+          135deg,
+          #000000 0%,
+          #000000 50%,
+          #000000 100%
+        );
+      }
+      .card-glass {
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+      .price-up {
+        color: #00d4aa;
+      }
+      .price-down {
+        color: #ff6b6b;
+      }
+      .glow-green {
+        box-shadow: 0 0 20px rgba(0, 212, 170, 0.3);
+      }
+      .glow-red {
+        box-shadow: 0 0 20px rgba(255, 107, 107, 0.3);
+      }
+      .glow-blue {
+        box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
+      }
+      .animate-pulse-slow {
+        animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+      }
+      .chart-glow {
+        filter: drop-shadow(0 0 10px rgba(0, 212, 170, 0.4));
+      }
+      /* Dark scrollbar styling for leaderboard table */
+      .table-scroll {
+        scrollbar-width: thin; /* Firefox */
+        scrollbar-color: rgba(75, 85, 99, 0.9) rgba(0, 0, 0, 0.4);
+      }
+      .table-scroll::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+      }
+      .table-scroll::-webkit-scrollbar-track {
+        background: rgba(0, 0, 0, 0.4);
+        border-radius: 8px;
+      }
+      .table-scroll::-webkit-scrollbar-thumb {
+        background: rgba(31, 41, 55, 0.8);
+        border-radius: 8px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+      .table-scroll::-webkit-scrollbar-thumb:hover {
+        background: rgba(55, 65, 81, 0.9);
+      }
+    </style>
+    <script
+      defer
+      data-domain="tradegame-xi.vercel.app"
+      src="https://plausible.io/js/script.outbound-links.js"
+    ></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  </head>
+  <body
+    class="gradient-bg text-white min-h-screen flex flex-col items-center justify-start md:justify-center"
+  >
+    <div class="container mx-auto px-4 py-8 max-w-6xl">
+      <!-- Global Winners Stats Card -->
+      <div class="text-center mb-4 max-w-4xl mx-auto">
+        <p class="text-sm text-gray-300">
+          So far
+          <span id="winnersCount" class="font-semibold text-white">0</span>
+          members made
+          <span id="winnersProfit" class="font-semibold text-emerald-400"
+            >$0.00</span
+          >
+          in profit
+        </p>
+      </div>
+
+      <!-- Start Screen -->
+      <div
+        id="startScreen"
+        class="card-glass rounded-2xl p-8 max-w-4xl mx-auto"
+      >
+        <div class="text-center mb-8">
+          <div class="inline-flex items-center space-x-3 mb-2">
+            <div
+              class="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl flex items-center justify-center"
+            >
+              <span class="text-xl">📊</span>
+            </div>
+            <h1
+              class="text-4xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent"
+            >
+              TradeGame
+            </h1>
+          </div>
+          <p class="text-gray-400 text-lg">Master the markets in 2 minutes</p>
+        </div>
+        <div class="grid md:grid-cols-3 gap-6 mb-8">
+          <div class="card-glass rounded-xl p-6 text-center">
+            <div
+              class="w-12 h-12 bg-gradient-to-r from-green-500 to-emerald-500 rounded-xl flex items-center justify-center mx-auto mb-4 glow-green"
+            >
+              <span class="text-2xl">🎯</span>
+            </div>
+            <h3 class="text-xl font-semibold mb-2 text-green-400">Objective</h3>
+            <p class="text-gray-300 text-sm">
+              Maximize your $10,000 portfolio in 2 minutes
+            </p>
+          </div>
+
+          <div class="card-glass rounded-xl p-6 text-center">
+            <div
+              class="w-12 h-12 bg-gradient-to-r from-yellow-500 to-orange-500 rounded-xl flex items-center justify-center mx-auto mb-4"
+            >
+              <span class="text-2xl">📊</span>
+            </div>
+            <h3 class="text-xl font-semibold mb-2 text-yellow-400">Strategy</h3>
+            <p class="text-gray-300 text-sm">
+              Buy low, sell high with quick timing
+            </p>
+          </div>
+
+          <div class="card-glass rounded-xl p-6 text-center">
+            <div
+              class="w-12 h-12 bg-gradient-to-r from-red-500 to-pink-500 rounded-xl flex items-center justify-center mx-auto mb-4 glow-red"
+            >
+              <span class="text-2xl">⚡</span>
+            </div>
+            <h3 class="text-xl font-semibold mb-2 text-red-400">Volatility</h3>
+            <p class="text-gray-300 text-sm">
+              High-risk, high-reward game dynamics
+            </p>
+          </div>
+        </div>
+
+        <!-- Disclaimer -->
+        <div
+          class="card-glass rounded-xl p-4 mb-6 border-l-4 border-yellow-400"
+        >
+          <div class="flex items-start space-x-3">
+            <div class="flex-shrink-0">
+              <span class="text-2xl">⚠️</span>
+            </div>
+            <div>
+              <h4 class="text-sm font-semibold text-yellow-400 mb-1">
+                Pemberitahuan Penting
+              </h4>
+              <p class="text-xs text-gray-300 leading-relaxed">
+                Ini adalah <strong>permainan seru</strong> yang dirancang hanya
+                untuk tujuan hiburan. Ini bukan simulasi perdagangan
+                <strong
+                  >dan tidak boleh digunakan sebagai nasihat keuangan atau untuk
+                  mempelajari strategi perdagangan yang sebenarnya.
+                </strong>
+                Perdagangan saham sungguhan mengandung risiko keuangan yang
+                signifikan.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="text-center">
+          <button
+            onclick="startGame()"
+            class="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-bold py-4 px-12 rounded-xl text-xl transition-all duration-300 glow-blue hover:scale-105 transform"
+          >
+            🚀 Start Trading
+          </button>
+          <div class="mt-4">
+            <button
+              onclick="openLeaderboard()"
+              class="bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-300 hover:scale-105 transform border border-emerald-500/30"
+            >
+              🏆 View Leaderboard
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Game Screen (hidden initially) -->
+      <div id="gameScreen" class="hidden">
+        <!-- Unified Responsive Layout -->
+
+        <!-- Timer - Desktop only -->
+        <div
+          class="hidden lg:block card-glass rounded-2xl p-6 mb-8 text-center"
+        >
+          <div class="flex items-center justify-center space-x-3 mb-2">
+            <div
+              class="w-3 h-3 bg-yellow-400 rounded-full animate-pulse-slow"
+            ></div>
+            <p class="text-lg font-medium text-gray-300">Session Time</p>
+          </div>
+          <p id="timer" class="text-5xl font-bold text-yellow-400 mb-2">3:00</p>
+          <div class="w-full bg-gray-700 rounded-full h-2">
+            <div
+              id="timerBar"
+              class="bg-gradient-to-r from-yellow-400 to-orange-500 h-2 rounded-full transition-all duration-1000"
+              style="width: 100%"
+            ></div>
+          </div>
+        </div>
+
+        <!-- Stats Dashboard -->
+        <div
+          class="grid grid-cols-2 lg:grid-cols-4 gap-2 lg:gap-4 mb-4 lg:mb-8"
+        >
+          <div
+            class="card-glass rounded-lg lg:rounded-xl p-3 lg:p-6 text-center"
+          >
+            <div class="flex items-center justify-center mb-1 lg:mb-2">
+              <span class="text-lg lg:text-2xl mr-1 lg:mr-2">💰</span>
+              <p class="text-xs lg:text-sm font-medium text-gray-400">Cash</p>
+            </div>
+            <p id="cash" class="text-sm lg:text-2xl font-bold text-white">
+              $10,000
+            </p>
+          </div>
+          <div
+            class="card-glass rounded-lg lg:rounded-xl p-3 lg:p-6 text-center"
+          >
+            <div class="flex items-center justify-center mb-1 lg:mb-2">
+              <span class="text-lg lg:text-2xl mr-1 lg:mr-2">📈</span>
+              <p class="text-xs lg:text-sm font-medium text-gray-400">Shares</p>
+            </div>
+            <p id="shares" class="text-sm lg:text-2xl font-bold text-white">
+              0
+            </p>
+          </div>
+          <div
+            class="card-glass rounded-lg lg:rounded-xl p-3 lg:p-6 text-center"
+          >
+            <div class="flex items-center justify-center mb-1 lg:mb-2">
+              <span class="text-lg lg:text-2xl mr-1 lg:mr-2">💎</span>
+              <p class="text-xs lg:text-sm font-medium text-gray-400">Price</p>
+            </div>
+            <p id="price" class="text-sm lg:text-2xl font-bold price-up">
+              $100.00
+            </p>
+          </div>
+          <div
+            class="card-glass rounded-lg lg:rounded-xl p-3 lg:p-6 text-center"
+          >
+            <div class="flex items-center justify-center mb-1 lg:mb-2">
+              <span class="text-lg lg:text-2xl mr-1 lg:mr-2">📊</span>
+              <p class="text-xs lg:text-sm font-medium text-gray-400">
+                Portfolio
+              </p>
+            </div>
+            <p id="total" class="text-sm lg:text-2xl font-bold text-white">
+              $10,000
+            </p>
+          </div>
+        </div>
+
+        <!-- Chart -->
+        <div
+          class="card-glass rounded-xl lg:rounded-2xl p-4 lg:p-6 mb-4 lg:mb-8"
+        >
+          <div class="flex items-center justify-between mb-3 lg:mb-4">
+            <h3 class="text-lg lg:text-xl font-semibold text-white">
+              Live Market Data
+            </h3>
+            <!-- Desktop Live indicator -->
+            <div class="hidden lg:flex items-center space-x-2">
+              <div
+                class="w-2 h-2 bg-green-400 rounded-full animate-pulse"
+              ></div>
+              <span class="text-sm text-gray-400">Live</span>
+              <button
+                id="audioToggle"
+                onclick="toggleAudio()"
+                class="ml-3 p-2 rounded-lg bg-gray-700 hover:bg-gray-600 transition-colors duration-200"
+                title="Toggle sounds"
+              >
+                🔊
+              </button>
+            </div>
+            <!-- Mobile Timer in top-right -->
+            <div class="lg:hidden flex items-center space-x-2">
+              <div
+                class="w-2 h-2 bg-yellow-400 rounded-full animate-pulse-slow"
+              ></div>
+              <span class="text-sm text-gray-400">Live</span>
+              <span class="text-yellow-400">•</span>
+              <p id="timer-mobile" class="text-lg font-bold text-yellow-400">
+                3:00
+              </p>
+              <button
+                id="audioToggle-mobile"
+                onclick="toggleAudio()"
+                class="ml-2 p-1 rounded bg-gray-700 hover:bg-gray-600 transition-colors duration-200 text-lg"
+                title="Toggle sounds"
+              >
+                🔊
+              </button>
+            </div>
+          </div>
+
+          <canvas
+            id="chart"
+            width="900"
+            height="300"
+            class="w-full h-48 lg:h-80 rounded-lg lg:rounded-xl chart-glow"
+          ></canvas>
+        </div>
+
+        <!-- Trading Controls -->
+        <div class="card-glass rounded-xl lg:rounded-2xl p-4 lg:p-6">
+          <h3
+            class="text-lg lg:text-xl font-semibold text-white mb-4 lg:mb-6 text-center"
+          >
+            Trading Panel
+          </h3>
+
+          <!-- Mobile Layout: Stacked buttons -->
+          <div class="lg:hidden space-y-3">
+            <!-- Buy Buttons -->
+            <div class="flex space-x-2">
+              <button
+                onclick="buyShares(1)"
+                class="flex-1 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-bold py-3 px-4 rounded-lg transition-all duration-300 glow-green hover:scale-105 transform disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+              >
+                📈 Buy 1
+              </button>
+              <button
+                onclick="buyShares(5)"
+                class="flex-1 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-bold py-3 px-4 rounded-lg transition-all duration-300 glow-green hover:scale-105 transform disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+              >
+                📈 Buy 5
+              </button>
+              <button
+                onclick="buyShares('max')"
+                class="flex-1 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-bold py-3 px-4 rounded-lg transition-all duration-300 glow-green hover:scale-105 transform disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+              >
+                📈 Max
+              </button>
+            </div>
+
+            <!-- Sell Buttons -->
+            <div class="flex space-x-2">
+              <button
+                onclick="sellShares(1)"
+                class="flex-1 bg-gradient-to-r from-red-600 to-pink-600 hover:from-red-700 hover:to-pink-700 text-white font-bold py-3 px-4 rounded-lg transition-all duration-300 glow-red hover:scale-105 transform disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+              >
+                📉 Sell 1
+              </button>
+              <button
+                onclick="sellShares(5)"
+                class="flex-1 bg-gradient-to-r from-red-600 to-pink-600 hover:from-red-700 hover:to-pink-700 text-white font-bold py-3 px-4 rounded-lg transition-all duration-300 glow-red hover:scale-105 transform disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+              >
+                📉 Sell 5
+              </button>
+              <button
+                onclick="sellShares('max')"
+                class="flex-1 bg-gradient-to-r from-red-600 to-pink-600 hover:from-red-700 hover:to-pink-700 text-white font-bold py-3 px-4 rounded-lg transition-all duration-300 glow-red hover:scale-105 transform disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+              >
+                📉 Max
+              </button>
+            </div>
+          </div>
+
+          <!-- Desktop Layout: Side by side -->
+          <div class="hidden lg:block">
+            <div class="grid md:grid-cols-2 gap-6">
+              <!-- Buy Section -->
+              <div class="space-y-4">
+                <div class="flex items-center space-x-2 mb-4">
+                  <div
+                    class="w-8 h-8 bg-gradient-to-r from-green-500 to-emerald-500 rounded-lg flex items-center justify-center"
+                  >
+                    <span class="text-white text-sm">📈</span>
+                  </div>
+                  <h4 class="text-lg font-semibold text-green-400">
+                    Buy Orders
+                  </h4>
+                </div>
+                <div class="grid grid-cols-3 gap-3">
+                  <button
+                    onclick="buyShares(1)"
+                    class="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-semibold py-3 px-4 rounded-xl transition-all duration-300 glow-green hover:scale-105 transform disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                  >
+                    Buy 1
+                  </button>
+                  <button
+                    onclick="buyShares(5)"
+                    class="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-semibold py-3 px-4 rounded-xl transition-all duration-300 glow-green hover:scale-105 transform disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                  >
+                    Buy 5
+                  </button>
+                  <button
+                    onclick="buyShares('max')"
+                    class="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-semibold py-3 px-4 rounded-xl transition-all duration-300 glow-green hover:scale-105 transform disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                  >
+                    Full Margin
+                  </button>
+                </div>
+              </div>
+              <!-- Sell Section -->
+              <div class="space-y-4">
+                <div class="flex items-center space-x-2 mb-4">
+                  <div
+                    class="w-8 h-8 bg-gradient-to-r from-red-500 to-pink-500 rounded-lg flex items-center justify-center"
+                  >
+                    <span class="text-white text-sm">📉</span>
+                  </div>
+                  <h4 class="text-lg font-semibold text-red-400">
+                    Sell Orders
+                  </h4>
+                </div>
+                <div class="grid grid-cols-3 gap-3">
+                  <button
+                    onclick="sellShares(1)"
+                    class="bg-gradient-to-r from-red-600 to-pink-600 hover:from-red-700 hover:to-pink-700 text-white font-semibold py-3 px-4 rounded-xl transition-all duration-300 glow-red hover:scale-105 transform disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                  >
+                    Sell 1
+                  </button>
+                  <button
+                    onclick="sellShares(5)"
+                    class="bg-gradient-to-r from-red-600 to-pink-600 hover:from-red-700 hover:to-pink-700 text-white font-semibold py-3 px-4 rounded-xl transition-all duration-300 glow-red hover:scale-105 transform disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                  >
+                    Sell 5
+                  </button>
+                  <button
+                    onclick="sellShares('max')"
+                    class="bg-gradient-to-r from-red-600 to-pink-600 hover:from-red-700 hover:to-pink-700 text-white font-semibold py-3 px-4 rounded-xl transition-all duration-300 glow-red hover:scale-105 transform disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                  >
+                    Full Margin
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Results Modal (hidden initially) -->
+      <div
+        id="resultsModal"
+        class="fixed inset-0 bg-black bg-opacity-75 backdrop-blur-sm flex items-center justify-center hidden z-50 overflow-y-auto"
+      >
+        <div
+          class="card-glass rounded-3xl p-4 max-w-lg w-full mx-4 text-center lg:p-8 my-8 max-h-[90vh] overflow-y-auto"
+        >
+          <div
+            class="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4 glow-blue lg:w-20 lg:h-20 lg:mb-6"
+          >
+            <span class="text-3xl lg:text-4xl">🏆</span>
+          </div>
+          <h2
+            class="text-2xl font-bold mb-1 bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent lg:text-3xl lg:mb-2"
+          >
+            Session Complete!
+          </h2>
+          <p class="text-gray-400 mb-6 text-sm lg:text-base lg:mb-8">
+            Your trading performance
+          </p>
+
+          <div class="space-y-4 lg:space-y-6">
+            <div class="card-glass rounded-xl p-4 lg:p-6">
+              <p class="text-xs text-gray-400 mb-1 lg:text-sm lg:mb-2">
+                Final Portfolio Value
+              </p>
+              <p
+                id="finalValue"
+                class="text-3xl font-bold text-white lg:text-4xl"
+              >
+                $0
+              </p>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3 lg:gap-4">
+              <div class="card-glass rounded-xl p-3 lg:p-4">
+                <p class="text-xs text-gray-400 mb-1 lg:text-sm">
+                  Starting Value
+                </p>
+                <p class="text-lg font-semibold text-white lg:text-xl">
+                  $10,000
+                </p>
+              </div>
+              <div class="card-glass rounded-xl p-3 lg:p-4">
+                <p class="text-xs text-gray-400 mb-1 lg:text-sm">Return</p>
+                <p id="returnPercent" class="text-lg font-semibold lg:text-xl">
+                  0%
+                </p>
+              </div>
+            </div>
+
+            <div class="card-glass rounded-xl p-4 lg:p-6">
+              <p class="text-xs text-gray-400 mb-1 lg:text-sm lg:mb-2">
+                Profit/Loss
+              </p>
+              <p id="profitLoss" class="text-2xl font-bold lg:text-3xl">$0</p>
+            </div>
+          </div>
+
+          <div class="mt-6 space-y-3 lg:mt-8 lg:space-y-4">
+            <button
+              onclick="restartGame()"
+              class="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-bold py-3 px-6 rounded-xl text-base transition-all duration-300 glow-blue hover:scale-105 transform lg:py-4 lg:px-8 lg:text-lg"
+            >
+              🔄 Trade Again
+            </button>
+
+            <button
+              onclick="shareOnX()"
+              class="w-full bg-gradient-to-r from-gray-800 to-gray-900 hover:from-gray-700 hover:to-gray-800 text-white font-bold py-3 px-6 rounded-xl text-base transition-all duration-300 hover:scale-105 transform border border-gray-600 lg:py-4 lg:px-8 lg:text-lg"
+            >
+              🐦 Share on X
+            </button>
+
+            <div class="pt-2 lg:pt-3">
+              <div class="grid grid-cols-1 gap-2">
+                <input
+                  id="playerNameInput"
+                  type="text"
+                  maxlength="20"
+                  placeholder="Enter your name (max 20 chars)"
+                  class="w-full bg-gray-800/70 border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                />
+                <button
+                  id="submitScoreButton"
+                  onclick="submitScoreUI()"
+                  class="w-full bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-300 hover:scale-105 transform"
+                >
+                  ✅ Submit to Leaderboard
+                </button>
+                <button
+                  onclick="openLeaderboard()"
+                  class="w-full bg-gradient-to-r from-emerald-700 to-green-700/80 hover:from-emerald-600 hover:to-green-600 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-300"
+                >
+                  🏆 View Leaderboard
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Leaderboard Modal -->
+      <div
+        id="leaderboardModal"
+        class="fixed inset-0 bg-black bg-opacity-75 backdrop-blur-sm flex items-center justify-center hidden z-50 overflow-y-auto"
+      >
+        <div
+          class="card-glass rounded-3xl p-4 max-w-2xl w-full mx-4 lg:p-8 my-8 max-h-[90vh] overflow-y-auto"
+        >
+          <div class="flex items-center justify-between mb-4 lg:mb-6">
+            <div class="flex items-center space-x-3">
+              <div
+                class="w-12 h-12 bg-gradient-to-r from-emerald-500 to-green-600 rounded-2xl flex items-center justify-center glow-green"
+              >
+                <span class="text-2xl">🏆</span>
+              </div>
+              <div>
+                <h2 class="text-xl lg:text-2xl font-bold">
+                  Global Leaderboard
+                </h2>
+                <p class="text-gray-400 text-xs lg:text-sm">
+                  Top portfolio values from recent sessions
+                </p>
+              </div>
+            </div>
+            <button
+              onclick="closeLeaderboard()"
+              class="px-3 py-2 rounded-lg bg-gray-800 hover:bg-gray-700 border border-gray-700"
+              title="Close"
+            >
+              ✖
+            </button>
+          </div>
+
+          <div class="overflow-hidden rounded-2xl border border-white/10">
+            <div class="overflow-x-auto max-h-96 overflow-y-auto table-scroll">
+              <table class="min-w-full divide-y divide-white/10">
+                <thead class="bg-white/5">
+                  <tr>
+                    <th
+                      class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider"
+                    >
+                      #
+                    </th>
+                    <th
+                      class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider"
+                    >
+                      Player
+                    </th>
+                    <th
+                      class="px-4 py-3 text-right text-xs font-medium text-gray-300 uppercase tracking-wider"
+                    >
+                      Portfolio
+                    </th>
+                    <th
+                      class="px-4 py-3 text-right text-xs font-medium text-gray-300 uppercase tracking-wider"
+                    >
+                      Return
+                    </th>
+                    <th
+                      class="px-4 py-3 text-right text-xs font-medium text-gray-300 uppercase tracking-wider"
+                    >
+                      When
+                    </th>
+                  </tr>
+                </thead>
+                <tbody id="leaderboardBody" class="divide-y divide-white/5">
+                  <!-- Rows injected by JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="mt-4 flex items-center justify-between">
+            <p class="text-gray-400 text-xs">
+              Scores reset periodically. No cheating 😉
+            </p>
+            <button
+              onclick="closeLeaderboard()"
+              class="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold py-2 px-4 rounded-lg transition-all"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="mt-12 mb-12 text-center">
+      <div
+        class="card-glass inline-block rounded-xl px-4 py-2 text-gray-300 text-sm border border-white/10"
+      >
+        Built with by
+        <a
+          href="https://github.com/dimasu21"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="text-blue-400 hover:text-blue-300 underline"
+        >
+          dimasu21
+        </a>
+      </div>
+    </footer>
+
+    <script>
+      // Audio setup for sound effects
+      let audioContext = null;
+      let isAudioEnabled = true;
+      let volume = 0.3; // Default volume (30%)
+
+      // Initialize audio context on first user interaction
+      function initAudio() {
+        if (!audioContext) {
+          audioContext = new (window.AudioContext ||
+            window.webkitAudioContext)();
+        }
+      }
+
+      // Create and play buy sound (ascending tone)
+      function playBuySound() {
+        if (!isAudioEnabled || !audioContext) return;
+
+        const oscillator = audioContext.createOscillator();
+        const gainNode = audioContext.createGain();
+
+        oscillator.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+
+        // Buy sound: ascending tone (C to G)
+        oscillator.frequency.setValueAtTime(261.63, audioContext.currentTime); // C4
+        oscillator.frequency.exponentialRampToValueAtTime(
+          392.0,
+          audioContext.currentTime + 0.15
+        ); // G4
+
+        oscillator.type = "sine";
+        gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+        gainNode.gain.linearRampToValueAtTime(
+          volume * 0.4,
+          audioContext.currentTime + 0.02
+        );
+        gainNode.gain.exponentialRampToValueAtTime(
+          0.01,
+          audioContext.currentTime + 0.15
+        );
+
+        oscillator.start(audioContext.currentTime);
+        oscillator.stop(audioContext.currentTime + 0.15);
+      }
+
+      // Create and play sell sound (cha-ching coins effect)
+      function playSellSound() {
+        if (!isAudioEnabled || !audioContext) return;
+
+        // Create multiple oscillators for a richer "cha-ching" sound
+        const now = audioContext.currentTime;
+
+        // First "cha" sound - quick ascending
+        const chaOsc = audioContext.createOscillator();
+        const chaGain = audioContext.createGain();
+        chaOsc.connect(chaGain);
+        chaGain.connect(audioContext.destination);
+
+        chaOsc.frequency.setValueAtTime(800, now);
+        chaOsc.frequency.exponentialRampToValueAtTime(1200, now + 0.08);
+        chaOsc.type = "triangle";
+        chaGain.gain.setValueAtTime(0, now);
+        chaGain.gain.linearRampToValueAtTime(volume * 0.3, now + 0.01);
+        chaGain.gain.exponentialRampToValueAtTime(0.01, now + 0.08);
+
+        chaOsc.start(now);
+        chaOsc.stop(now + 0.08);
+
+        // Second "ching" sound - metallic bell-like
+        const chingOsc1 = audioContext.createOscillator();
+        const chingOsc2 = audioContext.createOscillator();
+        const chingGain = audioContext.createGain();
+
+        chingOsc1.connect(chingGain);
+        chingOsc2.connect(chingGain);
+        chingGain.connect(audioContext.destination);
+
+        // Two frequencies for bell-like resonance
+        chingOsc1.frequency.setValueAtTime(1500, now + 0.06);
+        chingOsc2.frequency.setValueAtTime(2200, now + 0.06);
+
+        chingOsc1.type = "sine";
+        chingOsc2.type = "sine";
+
+        chingGain.gain.setValueAtTime(0, now + 0.06);
+        chingGain.gain.linearRampToValueAtTime(volume * 0.25, now + 0.07);
+        chingGain.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
+
+        chingOsc1.start(now + 0.06);
+        chingOsc1.stop(now + 0.2);
+        chingOsc2.start(now + 0.06);
+        chingOsc2.stop(now + 0.2);
+      }
+
+      // Toggle audio on/off
+      function toggleAudio() {
+        isAudioEnabled = !isAudioEnabled;
+        if (isAudioEnabled && !audioContext) {
+          initAudio();
+        }
+        updateAudioButton();
+      }
+
+      // Update audio button appearance
+      function updateAudioButton() {
+        const audioButton = document.getElementById("audioToggle");
+        const audioButtonMobile = document.getElementById("audioToggle-mobile");
+
+        if (audioButton) {
+          audioButton.innerHTML = isAudioEnabled ? "🔊" : "🔇";
+          audioButton.title = isAudioEnabled ? "Mute sounds" : "Enable sounds";
+        }
+
+        if (audioButtonMobile) {
+          audioButtonMobile.innerHTML = isAudioEnabled ? "🔊" : "🔇";
+          audioButtonMobile.title = isAudioEnabled
+            ? "Mute sounds"
+            : "Enable sounds";
+        }
+      }
+
+      // ---------------- Formatting helpers ----------------
+      function formatMoney(value) {
+        return `$${Number(value).toLocaleString("en-US", {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        })}`;
+      }
+      function formatSignedMoney(value) {
+        const sign = value >= 0 ? "+" : "-";
+        const abs = Math.abs(Number(value)).toLocaleString("en-US", {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        });
+        return `${sign}$${abs}`;
+      }
+      function formatInteger(value) {
+        return Number(value).toLocaleString("en-US", {
+          maximumFractionDigits: 0,
+        });
+      }
+
+      // Basic HTML escape to prevent XSS in dynamic table rendering
+      function escapeHtml(unsafe) {
+        return String(unsafe)
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&#039;");
+      }
+      function toFiniteNumber(value, fallback = 0) {
+        const n = Number(value);
+        return Number.isFinite(n) ? n : fallback;
+      }
+      function clamp(value, min, max) {
+        return Math.min(max, Math.max(min, value));
+      }
+
+      // Game configuration
+      const GAME_DURATION_SECONDS = 120; // Change this to set game duration (10 for testing, 120 for 2 minutes)
+
+      // Game state
+      let cash = 10000;
+      let shares = 0;
+      let price = 100;
+      let history = [price];
+      let candlesticks = []; // Array of {open, high, low, close, time}
+      let trades = []; // { index: number, price: number, side: 'buy'|'sell', candleIndex: number }
+      let timeIndex = 0; // global index of the last point in history
+      const historyMaxLen = 200;
+      const candleTimeframe = 5; // seconds per candle
+
+      // Timer state
+      let timeRemaining = GAME_DURATION_SECONDS;
+      let gameActive = true;
+      let timerInterval = null;
+
+      // Current candle data
+      let currentCandle = {
+        open: price,
+        high: price,
+        low: price,
+        close: price,
+        time: 0,
+      };
+
+      // --- Price model state (realistic stochastic process) ---
+      // Work in log-price for numerical stability
+      let logPrice = Math.log(price);
+
+      // Regime (bull/bear) with different annual drifts
+      let regime = "bull"; // "bull" or "bear"
+      const regimeAnnualDrift = { bull: 0.3, bear: -0.3 }; // ~±30% per year drift - much stronger trends
+      const regimeSwitchProbabilityPerTick = 0.005; // ~0.5% chance to switch per tick - more frequent regime changes
+
+      // Mean reversion target for log-price (toward initial price level)
+      const longTermLogMean = Math.log(100);
+      const meanReversionSpeed = 0.2; // kappa
+
+      // Volatility (GARCH-like clustering) - annualized starting volatility
+      let variance = Math.pow(0.8, 2); // (80% annual vol)^2 - much higher starting volatility
+      let lastLogReturn = 0;
+      // GARCH(1,1)-style params (kept simple)
+      const garchOmega = Math.pow(0.3, 2) * 1e-6; // higher base variance per tick
+      const garchAlpha = 0.2; // higher weight on last squared return
+      const garchBeta = 0.75; // lower persistence for more volatility clustering
+      const minAnnualVol = 0.2; // floor 20% - much higher minimum
+      const maxAnnualVol = 2.0; // cap 200% - much higher maximum
+
+      // Jumps (rare news shocks) in log-returns
+      const jumpProbabilityPerTick = 0.03; // 3% chance per tick - more frequent jumps
+      const jumpMean = 0.0; // symmetric on average
+      const jumpStdDev = 0.15; // ~15% log-return std when jump happens - much bigger jumps
+
+      // Time step: assume 252 trading days, 6.5 trading hours/day → ~23400s/day
+      // Here tick is 1s, so dt ≈ 1 / (252*23400) ≈ 1.7e-7. That's too small for a toy.
+      // For gameplay, use a larger effective dt so changes are visible.
+      const effectiveDt = 1 / 252; // treat each second like ~1 trading day for fun
+
+      // Gaussian RNG (Box–Muller) with one-sample cache
+      let _randnCache = null;
+      function randn() {
+        if (_randnCache !== null) {
+          const v = _randnCache;
+          _randnCache = null;
+          return v;
+        }
+        let u1 = 0,
+          u2 = 0;
+        while (u1 === 0) u1 = Math.random();
+        while (u2 === 0) u2 = Math.random();
+        const mag = Math.sqrt(-2.0 * Math.log(u1));
+        const z0 = mag * Math.cos(2.0 * Math.PI * u2);
+        const z1 = mag * Math.sin(2.0 * Math.PI * u2);
+        _randnCache = z1;
+        return z0;
+      }
+
+      function updateUI() {
+        document.getElementById("cash").innerText = formatMoney(cash);
+        document.getElementById("shares").innerText = formatInteger(shares);
+
+        // Update price with color coding
+        const priceElement = document.getElementById("price");
+        priceElement.innerText = formatMoney(price);
+
+        // Color code based on previous price - use responsive classes
+        if (window.lastPrice) {
+          if (price > window.lastPrice) {
+            priceElement.className = "text-sm lg:text-2xl font-bold price-up";
+          } else if (price < window.lastPrice) {
+            priceElement.className = "text-sm lg:text-2xl font-bold price-down";
+          }
+        }
+        window.lastPrice = price;
+
+        document.getElementById("total").innerText = formatMoney(
+          cash + shares * price
+        );
+        updateButtonStates();
+        drawChart();
+      }
+
+      function updateButtonStates() {
+        if (!gameActive) return;
+
+        const affordable = Math.floor(cash / price);
+
+        // Get all buy buttons (there are multiple with same onclick)
+        const buy1Btns = document.querySelectorAll(
+          'button[onclick="buyShares(1)"]'
+        );
+        const buy5Btns = document.querySelectorAll(
+          'button[onclick="buyShares(5)"]'
+        );
+        const buyMaxBtns = document.querySelectorAll(
+          "button[onclick=\"buyShares('max')\"]"
+        );
+        const sell1Btns = document.querySelectorAll(
+          'button[onclick="sellShares(1)"]'
+        );
+        const sell5Btns = document.querySelectorAll(
+          'button[onclick="sellShares(5)"]'
+        );
+        const sellMaxBtns = document.querySelectorAll(
+          "button[onclick=\"sellShares('max')\"]"
+        );
+
+        // Update buy buttons - disable if not enough cash
+        buy1Btns.forEach((btn) => {
+          if (affordable >= 1) {
+            btn.disabled = false;
+            btn.classList.remove("opacity-50", "cursor-not-allowed");
+            btn.classList.add("hover:scale-105");
+          } else {
+            btn.disabled = true;
+            btn.classList.add("opacity-50", "cursor-not-allowed");
+            btn.classList.remove("hover:scale-105");
+          }
+        });
+
+        buy5Btns.forEach((btn) => {
+          if (affordable >= 5) {
+            btn.disabled = false;
+            btn.classList.remove("opacity-50", "cursor-not-allowed");
+            btn.classList.add("hover:scale-105");
+          } else {
+            btn.disabled = true;
+            btn.classList.add("opacity-50", "cursor-not-allowed");
+            btn.classList.remove("hover:scale-105");
+          }
+        });
+
+        buyMaxBtns.forEach((btn) => {
+          if (affordable >= 1) {
+            btn.disabled = false;
+            btn.classList.remove("opacity-50", "cursor-not-allowed");
+            btn.classList.add("hover:scale-105");
+          } else {
+            btn.disabled = true;
+            btn.classList.add("opacity-50", "cursor-not-allowed");
+            btn.classList.remove("hover:scale-105");
+          }
+        });
+
+        // Update sell buttons - disable if not enough shares
+        sell1Btns.forEach((btn) => {
+          if (shares >= 1) {
+            btn.disabled = false;
+            btn.classList.remove("opacity-50", "cursor-not-allowed");
+            btn.classList.add("hover:scale-105");
+          } else {
+            btn.disabled = true;
+            btn.classList.add("opacity-50", "cursor-not-allowed");
+            btn.classList.remove("hover:scale-105");
+          }
+        });
+
+        sell5Btns.forEach((btn) => {
+          if (shares >= 5) {
+            btn.disabled = false;
+            btn.classList.remove("opacity-50", "cursor-not-allowed");
+            btn.classList.add("hover:scale-105");
+          } else {
+            btn.disabled = true;
+            btn.classList.add("opacity-50", "cursor-not-allowed");
+            btn.classList.remove("hover:scale-105");
+          }
+        });
+
+        sellMaxBtns.forEach((btn) => {
+          if (shares >= 1) {
+            btn.disabled = false;
+            btn.classList.remove("opacity-50", "cursor-not-allowed");
+            btn.classList.add("hover:scale-105");
+          } else {
+            btn.disabled = true;
+            btn.classList.add("opacity-50", "cursor-not-allowed");
+            btn.classList.remove("hover:scale-105");
+          }
+        });
+      }
+
+      function buyShares(amount) {
+        if (!gameActive) return;
+        const affordable = Math.floor(cash / price);
+        let toBuy = 0;
+        if (amount === "max") {
+          toBuy = affordable;
+        } else {
+          toBuy = Math.min(affordable, Math.max(0, amount));
+        }
+        if (toBuy > 0) {
+          // Initialize audio context on first trade if needed
+          if (!audioContext) {
+            initAudio();
+          }
+          // Play buy sound effect
+          playBuySound();
+
+          shares += toBuy;
+          cash -= toBuy * price;
+          trades.push({
+            index: timeIndex,
+            price: price,
+            side: "buy",
+            candleIndex: candlesticks.length,
+          });
+          updateUI();
+        }
+      }
+
+      function sellShares(amount) {
+        if (!gameActive) return;
+        let toSell = 0;
+        if (amount === "max") {
+          toSell = shares;
+        } else {
+          toSell = Math.min(shares, Math.max(0, amount));
+        }
+        if (toSell > 0) {
+          // Initialize audio context on first trade if needed
+          if (!audioContext) {
+            initAudio();
+          }
+          // Play sell sound effect
+          playSellSound();
+
+          cash += toSell * price;
+          shares -= toSell;
+          trades.push({
+            index: timeIndex,
+            price: price,
+            side: "sell",
+            candleIndex: candlesticks.length,
+          });
+          updateUI();
+        }
+      }
+
+      function tick() {
+        if (!gameActive) return;
+
+        // Occasionally switch regimes
+        if (Math.random() < regimeSwitchProbabilityPerTick) {
+          regime = regime === "bull" ? "bear" : "bull";
+        }
+
+        // Convert current annualized variance to per-tick (effective) variance
+        // variance here is annualized; sigmaAnnual = sqrt(variance)
+        const sigmaAnnual = Math.sqrt(variance);
+        const sigmaPerTick = sigmaAnnual * Math.sqrt(effectiveDt);
+
+        // Drift (risk-neutral adjustment simplified): regime drift - 0.5*sigma^2
+        const annualDrift = regimeAnnualDrift[regime];
+        const driftTerm =
+          (annualDrift - 0.5 * Math.pow(sigmaAnnual, 2)) * effectiveDt;
+
+        // Mean reversion toward long-term mean in log space
+        const meanReversionTerm =
+          meanReversionSpeed * (longTermLogMean - logPrice) * effectiveDt;
+
+        // Diffusion term (Gaussian shock)
+        const diffusionTerm = sigmaPerTick * randn();
+
+        // Jump term (rare, larger shock)
+        const jumpTerm =
+          Math.random() < jumpProbabilityPerTick
+            ? jumpMean + jumpStdDev * randn()
+            : 0;
+
+        // Update log price
+        const dLogP = driftTerm + meanReversionTerm + diffusionTerm + jumpTerm;
+        logPrice += dLogP;
+        price = Math.max(1, Math.exp(logPrice));
+
+        // Update variance with simple GARCH(1,1)
+        const newVariance =
+          garchOmega +
+          (garchAlpha * Math.pow(dLogP, 2)) / Math.max(effectiveDt, 1e-9) +
+          garchBeta * variance;
+        // Clamp annualized volatility to reasonable bounds
+        const newSigmaAnnual = Math.min(
+          maxAnnualVol,
+          Math.max(minAnnualVol, Math.sqrt(newVariance))
+        );
+        variance = Math.pow(newSigmaAnnual, 2);
+        lastLogReturn = dLogP;
+
+        // Update current candle
+        currentCandle.high = Math.max(currentCandle.high, price);
+        currentCandle.low = Math.min(currentCandle.low, price);
+        currentCandle.close = price;
+
+        // Check if we need to create a new candle
+        const currentTime = GAME_DURATION_SECONDS - timeRemaining;
+        if (currentTime >= currentCandle.time + candleTimeframe) {
+          // Save current candle
+          candlesticks.push({ ...currentCandle });
+
+          // Start new candle
+          currentCandle = {
+            open: price,
+            high: price,
+            low: price,
+            close: price,
+            time: currentTime,
+          };
+
+          // Keep candlestick history manageable
+          if (candlesticks.length > 50) candlesticks.shift();
+        }
+
+        // Keep price history manageable
+        history.push(price);
+        timeIndex += 1;
+        if (history.length > historyMaxLen) history.shift();
+        updateUI();
+      }
+
+      function drawChart() {
+        // Use the unified chart canvas
+        const canvas = document.getElementById("chart");
+
+        if (!canvas || canvas.offsetParent === null) {
+          return;
+        }
+
+        const rect = canvas.getBoundingClientRect();
+
+        // Set canvas size to match display size
+        canvas.width = rect.width;
+        canvas.height = rect.height;
+
+        const w = canvas.width;
+        const h = canvas.height;
+
+        // Get the context for this specific canvas
+        const ctx = canvas.getContext("2d");
+        ctx.clearRect(0, 0, w, h);
+
+        // Combine completed candlesticks with current candle
+        const allCandles = [...candlesticks];
+        if (currentCandle.time > 0 || candlesticks.length === 0) {
+          allCandles.push({ ...currentCandle });
+        }
+
+        if (allCandles.length === 0) return;
+
+        // Compute dynamic y scale with padding
+        const allPrices = allCandles.flatMap((c) => [c.high, c.low]);
+        const minP = Math.min(...allPrices);
+        const maxP = Math.max(...allPrices);
+        const range = Math.max(1e-6, maxP - minP);
+        const pad = range * 0.05;
+        const yMin = Math.max(0, minP - pad);
+        const yMax = maxP + pad;
+        const innerTop = 10;
+        const innerBottom = 10;
+        const innerHeight = Math.max(1, h - innerTop - innerBottom);
+
+        const n = allCandles.length;
+        const candleWidth = 12; // Fixed width for all candles
+        const spacingBetweenCandles = 4; // Fixed spacing between candles
+
+        // Draw candlesticks
+        for (let i = 0; i < n; i++) {
+          const candle = allCandles[i];
+          const x =
+            10 + i * (candleWidth + spacingBetweenCandles) + candleWidth / 2;
+
+          // Convert prices to y coordinates
+          const highY =
+            h -
+            innerBottom -
+            ((candle.high - yMin) / (yMax - yMin)) * innerHeight;
+          const lowY =
+            h -
+            innerBottom -
+            ((candle.low - yMin) / (yMax - yMin)) * innerHeight;
+          const openY =
+            h -
+            innerBottom -
+            ((candle.open - yMin) / (yMax - yMin)) * innerHeight;
+          const closeY =
+            h -
+            innerBottom -
+            ((candle.close - yMin) / (yMax - yMin)) * innerHeight;
+
+          // Determine if candle is bullish (green) or bearish (red)
+          const isBullish = candle.close >= candle.open;
+          const bodyTop = Math.min(openY, closeY);
+          const bodyBottom = Math.max(openY, closeY);
+          const bodyHeight = Math.max(1, bodyBottom - bodyTop);
+
+          // Draw wick (high-low line)
+          ctx.beginPath();
+          ctx.moveTo(x, highY);
+          ctx.lineTo(x, lowY);
+          ctx.strokeStyle = isBullish ? "#22c55e" : "#ef4444";
+          ctx.lineWidth = 1;
+          ctx.stroke();
+
+          // Draw candle body
+          if (bodyHeight > 0.5) {
+            ctx.fillStyle = isBullish ? "#22c55e" : "#ef4444";
+            ctx.fillRect(x - candleWidth / 2, bodyTop, candleWidth, bodyHeight);
+
+            // Draw body border
+            ctx.strokeStyle = isBullish ? "#16a34a" : "#dc2626";
+            ctx.lineWidth = 1;
+            ctx.strokeRect(
+              x - candleWidth / 2,
+              bodyTop,
+              candleWidth,
+              bodyHeight
+            );
+          } else {
+            // Doji - draw a line for the open/close
+            ctx.beginPath();
+            ctx.moveTo(x - candleWidth / 2, openY);
+            ctx.lineTo(x + candleWidth / 2, openY);
+            ctx.strokeStyle = isBullish ? "#22c55e" : "#ef4444";
+            ctx.lineWidth = 2;
+            ctx.stroke();
+          }
+        }
+
+        // Draw trade markers (horizontal ticks on the corresponding candle at trade price)
+        const markerHalfWidth = Math.max(3, Math.floor((candleWidth + 4) / 2));
+        trades.forEach((t) => {
+          const i = t.candleIndex;
+          if (i < 0 || i >= n) return;
+
+          const candle = allCandles[i];
+          // Clamp marker within chart price bounds
+          const yVal = Math.max(yMin, Math.min(yMax, t.price));
+          const y =
+            h - innerBottom - ((yVal - yMin) / (yMax - yMin)) * innerHeight;
+
+          const x =
+            10 + i * (candleWidth + spacingBetweenCandles) + candleWidth / 2;
+
+          // Choose color by side
+          const color = t.side === "buy" ? "#22c55e" : "#ef4444";
+
+          // Slight glow stroke for visibility
+          ctx.beginPath();
+          ctx.strokeStyle = "rgba(255,255,255,0.15)";
+          ctx.lineWidth = 3;
+          ctx.moveTo(x - markerHalfWidth, y);
+          ctx.lineTo(x + markerHalfWidth, y);
+          ctx.stroke();
+
+          // Main colored line
+          ctx.beginPath();
+          ctx.strokeStyle = color;
+          ctx.lineWidth = 2;
+          ctx.moveTo(x - markerHalfWidth, y);
+          ctx.lineTo(x + markerHalfWidth, y);
+          ctx.stroke();
+
+          // Small side nub to indicate direction (up for buy, down for sell)
+          ctx.beginPath();
+          ctx.strokeStyle = color;
+          ctx.lineWidth = 2;
+          if (t.side === "buy") {
+            ctx.moveTo(x + markerHalfWidth, y);
+            ctx.lineTo(x + markerHalfWidth, y - 6);
+          } else {
+            ctx.moveTo(x + markerHalfWidth, y);
+            ctx.lineTo(x + markerHalfWidth, y + 6);
+          }
+          ctx.stroke();
+        });
+      }
+
+      function updateTimer() {
+        const minutes = Math.floor(timeRemaining / 60);
+        const seconds = timeRemaining % 60;
+        const timeString = `${minutes}:${seconds.toString().padStart(2, "0")}`;
+
+        // Update desktop timer
+        const desktopTimer = document.getElementById("timer");
+        if (desktopTimer) {
+          desktopTimer.textContent = timeString;
+        }
+
+        // Update mobile timer
+        const mobileTimer = document.getElementById("timer-mobile");
+        if (mobileTimer) {
+          mobileTimer.textContent = timeString;
+        }
+
+        // Update desktop progress bar only
+        const progress = (timeRemaining / GAME_DURATION_SECONDS) * 100;
+
+        const desktopTimerBar = document.getElementById("timerBar");
+        if (desktopTimerBar) {
+          desktopTimerBar.style.width = `${progress}%`;
+        }
+
+        if (timeRemaining <= 0) {
+          endGame();
+        }
+      }
+
+      function endGame() {
+        gameActive = false;
+        clearInterval(timerInterval);
+
+        const finalValue = cash + shares * price;
+        const profitLoss = finalValue - 10000;
+        const returnPercent = (profitLoss / 10000) * 100;
+
+        document.getElementById("finalValue").textContent =
+          formatMoney(finalValue);
+        document.getElementById("profitLoss").textContent =
+          formatSignedMoney(profitLoss);
+        document.getElementById("returnPercent").textContent = `${
+          returnPercent >= 0 ? "+" : ""
+        }${returnPercent.toFixed(1)}%`;
+
+        // Color code the profit/loss
+        const profitElement = document.getElementById("profitLoss");
+        const returnElement = document.getElementById("returnPercent");
+        if (profitLoss >= 0) {
+          profitElement.className = "text-2xl font-bold text-green-400";
+          returnElement.className = "text-xl text-green-400";
+        } else {
+          profitElement.className = "text-2xl font-bold text-red-400";
+          returnElement.className = "text-xl text-red-400";
+        }
+
+        document.getElementById("resultsModal").classList.remove("hidden");
+
+        // Reset submit controls visibility for a fresh session end
+        const nameInput = document.getElementById("playerNameInput");
+        const submitBtn = document.getElementById("submitScoreButton");
+        if (nameInput) nameInput.classList.remove("hidden");
+        if (submitBtn) submitBtn.classList.remove("hidden");
+      }
+
+      // ---------------- Leaderboard (UI-first, local placeholder) ----------------
+      let leaderboardData = [
+        {
+          name: "Alice",
+          portfolio: 13750.23,
+          returnPct: 37.5,
+          timestamp: Date.now() - 1000 * 60 * 20,
+        },
+        {
+          name: "Bob",
+          portfolio: 12890.11,
+          returnPct: 28.9,
+          timestamp: Date.now() - 1000 * 60 * 60 * 2,
+        },
+        {
+          name: "Charlie",
+          portfolio: 11985.5,
+          returnPct: 19.9,
+          timestamp: Date.now() - 1000 * 60 * 60 * 5,
+        },
+        {
+          name: "Diana",
+          portfolio: 11234.56,
+          returnPct: 12.3,
+          timestamp: Date.now() - 1000 * 60 * 60 * 24,
+        },
+        {
+          name: "Evan",
+          portfolio: 10980.0,
+          returnPct: 9.8,
+          timestamp: Date.now() - 1000 * 60 * 60 * 36,
+        },
+      ];
+
+      function timeAgo(ts) {
+        const seconds = Math.floor((Date.now() - ts) / 1000);
+        if (seconds < 60) return `${seconds}s ago`;
+        const minutes = Math.floor(seconds / 60);
+        if (minutes < 60) return `${minutes}m ago`;
+        const hours = Math.floor(minutes / 60);
+        if (hours < 24) return `${hours}h ago`;
+        const days = Math.floor(hours / 24);
+        return `${days}d ago`;
+      }
+
+      function renderLeaderboard() {
+        const tbody = document.getElementById("leaderboardBody");
+        if (!tbody) return;
+        // Sort by portfolio desc, then name
+        const sorted = [...leaderboardData].sort(
+          (a, b) => b.portfolio - a.portfolio
+        );
+        tbody.innerHTML = sorted
+          .slice(0, 25)
+          .map((entry, idx) => {
+            const rank = idx + 1;
+            const rankColor =
+              rank === 1
+                ? "text-yellow-300"
+                : rank === 2
+                ? "text-gray-300"
+                : rank === 3
+                ? "text-amber-400"
+                : "text-gray-400";
+            const safeName = escapeHtml(
+              (entry?.name ?? "Anonymous").toString().slice(0, 30)
+            );
+            const safePortfolio = toFiniteNumber(entry?.portfolio, 0);
+            const safeReturnPct = clamp(
+              toFiniteNumber(entry?.returnPct, 0),
+              -1000,
+              10000
+            );
+            const retColor =
+              safeReturnPct >= 0 ? "text-green-400" : "text-red-400";
+            return `
+                            <tr class="hover:bg-white/5 transition-colors">
+                                <td class="px-4 py-3 text-sm ${rankColor}">${rank}</td>
+                                <td class="px-4 py-3 text-sm">${safeName}</td>
+                                <td class="px-4 py-3 text-sm text-right font-semibold">${formatMoney(
+                                  safePortfolio
+                                )}</td>
+                                <td class="px-4 py-3 text-sm text-right ${retColor}">${
+              safeReturnPct >= 0 ? "+" : ""
+            }${safeReturnPct.toFixed(1)}%</td>
+                                <td class="px-4 py-3 text-sm text-right text-gray-400">${timeAgo(
+                                  entry.timestamp
+                                )}</td>
+                            </tr>
+                        `;
+          })
+          .join("");
+      }
+
+      async function openLeaderboard() {
+        try {
+          await fetchLeaderboardSupabase();
+        } catch (e) {
+          console.warn("Leaderboard fetch failed, using local data", e);
+        }
+        renderLeaderboard();
+        document.getElementById("leaderboardModal").classList.remove("hidden");
+      }
+
+      function closeLeaderboard() {
+        document.getElementById("leaderboardModal").classList.add("hidden");
+      }
+
+      async function submitScoreUI() {
+        const input = document.getElementById("playerNameInput");
+        const name = (input?.value || "").trim() || "Anonymous";
+        const finalValue = cash + shares * price;
+        const returnPct = ((finalValue - 10000) / 10000) * 100;
+        // Try Supabase first; fallback to local
+        let submitted = false;
+        try {
+          submitted = await submitScoreSupabase({
+            name,
+            portfolio: Number(finalValue.toFixed(2)),
+            returnPct: Number(returnPct.toFixed(1)),
+          });
+        } catch (e) {
+          console.warn("Supabase submit failed, using local fallback", e);
+        }
+        if (!submitted) {
+          leaderboardData.push({
+            name,
+            portfolio: Number(finalValue.toFixed(2)),
+            returnPct: Number(returnPct.toFixed(1)),
+            timestamp: Date.now(),
+          });
+        }
+        input.value = "";
+        // Hide input and button to avoid spamming multiple submissions per result
+        input.classList.add("hidden");
+        const submitBtn = document.getElementById("submitScoreButton");
+        if (submitBtn) submitBtn.classList.add("hidden");
+        openLeaderboard();
+      }
+
+      // ---------------- Supabase integration ----------------
+      const SUPABASE_URL =
+        window.SUPABASE_URL || "https://detboyxzndkphfwdfcac.supabase.co"; // e.g. https://your-project.supabase.co
+      const SUPABASE_ANON_KEY =
+        window.SUPABASE_ANON_KEY ||
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRldGJveXh6bmRrcGhmd2RmY2FjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzk3OTgxODYsImV4cCI6MjA1NTM3NDE4Nn0.1aE9J99Pk18uqS2xEYkyCJK0c46r8mLRinJVOKkR984"; // public anon key
+      const LEADERBOARD_TABLE =
+        window.LEADERBOARD_TABLE || "leaderboard_scores";
+
+      async function getSupabaseClient() {
+        if (!window.supabase || !SUPABASE_URL || !SUPABASE_ANON_KEY) {
+          return null;
+        }
+        try {
+          return window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        } catch (e) {
+          console.warn("Failed to init Supabase client", e);
+          return null;
+        }
+      }
+
+      async function submitScoreSupabase({ name, portfolio, returnPct }) {
+        const client = await getSupabaseClient();
+        if (!client) return false;
+        const payload = {
+          name,
+          portfolio,
+          return_pct: returnPct,
+        };
+        const { error } = await client.from(LEADERBOARD_TABLE).insert(payload);
+        if (error) {
+          console.warn("Insert error", error);
+          return false;
+        }
+        return true;
+      }
+
+      async function fetchLeaderboardSupabase() {
+        const client = await getSupabaseClient();
+        if (!client) return false;
+        const { data, error } = await client
+          .from(LEADERBOARD_TABLE)
+          .select("name, portfolio, return_pct, created_at")
+          .order("portfolio", { ascending: false })
+          .limit(25);
+        if (error) {
+          console.warn("Select error", error);
+          return false;
+        }
+        const rows = Array.isArray(data) ? data : [];
+        const tolerance = 0.5; // allowed difference in percentage points
+        const accepted = [];
+        for (const row of rows) {
+          const portfolio = toFiniteNumber(row?.portfolio, 0);
+          if (!Number.isFinite(portfolio) || portfolio <= 0) continue;
+          const computedReturn = ((portfolio - 10000) / 10000) * 100;
+          const reportedReturn = toFiniteNumber(row?.return_pct, NaN);
+          if (Number.isFinite(reportedReturn)) {
+            if (Math.abs(reportedReturn - computedReturn) > tolerance) {
+              // Skip inconsistent rows
+              continue;
+            }
+          }
+          accepted.push({
+            name: String(row?.name ?? "Anonymous").slice(0, 30),
+            portfolio: portfolio,
+            returnPct: clamp(computedReturn, -1000, 10000),
+            timestamp: row?.created_at
+              ? Date.parse(row.created_at)
+              : Date.now(),
+          });
+        }
+        leaderboardData = accepted;
+        return true;
+      }
+
+      // ---------------- Global Winners Stats ----------------
+      function animateNumber({
+        element,
+        from = 0,
+        to = 0,
+        durationMs = 1000,
+        formatter = (v) => `${v}`,
+      }) {
+        const start = performance.now();
+        function frame(now) {
+          const t = Math.min(1, (now - start) / durationMs);
+          const eased = 1 - Math.pow(1 - t, 3); // easeOutCubic
+          const value = from + (to - from) * eased;
+          element.textContent = formatter(value);
+          if (t < 1) requestAnimationFrame(frame);
+        }
+        requestAnimationFrame(frame);
+      }
+
+      async function fetchGlobalWinnersStats() {
+        const countEl = document.getElementById("winnersCount");
+        const profitEl = document.getElementById("winnersProfit");
+        if (!countEl || !profitEl) return;
+
+        let winnersCount = 0;
+        let totalProfit = 0;
+
+        try {
+          const client = await getSupabaseClient();
+          if (!client) throw new Error("No Supabase client");
+
+          // Fetch profitable sessions (portfolio > 10000). We only need portfolio values.
+          // Range set high to accommodate many rows; PostgREST caps at 1000 by default, but Supabase allows larger ranges up to 10000 per request.
+          const { data, error, count } = await client
+            .from(LEADERBOARD_TABLE)
+            .select("portfolio", { count: "exact" })
+            .gt("portfolio", 10000)
+            .range(0, 9999);
+
+          if (error) throw error;
+
+          winnersCount = typeof count === "number" ? count : data?.length || 0;
+          totalProfit = (data || []).reduce((sum, row) => {
+            const portfolioVal = Number(row.portfolio || 0);
+            return sum + Math.max(0, portfolioVal - 10000);
+          }, 0);
+        } catch (e) {
+          console.warn("Global winners stats fetch failed", e);
+          // Leave defaults (0), but don't break UI
+        }
+
+        animateNumber({
+          element: countEl,
+          from: 0,
+          to: winnersCount,
+          durationMs: 2000,
+          formatter: (v) => formatInteger(Math.round(v)),
+        });
+        animateNumber({
+          element: profitEl,
+          from: 0,
+          to: totalProfit,
+          durationMs: 2400,
+          formatter: (v) => formatMoney(v),
+        });
+      }
+
+      function startGame() {
+        // Hide start screen, show game screen
+        document.getElementById("startScreen").classList.add("hidden");
+        document.getElementById("gameScreen").classList.remove("hidden");
+
+        // Initialize game state
+        gameActive = true;
+        timeRemaining = GAME_DURATION_SECONDS;
+
+        // Initialize audio button state
+        updateAudioButton();
+
+        // Reset candlestick data
+        candlesticks = [];
+        currentCandle = {
+          open: price,
+          high: price,
+          low: price,
+          close: price,
+          time: 0,
+        };
+
+        // Start the game
+        updateUI();
+        updateTimer();
+
+        // Force chart redraw after a short delay to ensure mobile layout is ready
+        setTimeout(() => {
+          drawChart();
+        }, 100);
+
+        timerInterval = setInterval(() => {
+          timeRemaining--;
+          updateTimer();
+        }, 1000);
+        setInterval(tick, 500);
+      }
+
+      function shareOnX() {
+        const finalValue = cash + shares * price;
+        const profitLoss = finalValue - 10000;
+        const returnPercent = (profitLoss / 10000) * 100;
+
+        // Create shareable text
+        let shareText = `Just played TradeGame! 🚀\n\n`;
+        shareText += `Portfolio: ${formatMoney(finalValue)}\n`;
+        shareText += `Return: ${
+          returnPercent >= 0 ? "+" : ""
+        }${returnPercent.toFixed(1)}%\n\n`;
+        shareText += `Can you beat my score? Try it now! 📈\n\n`;
+        shareText += `${window.location.href} 🎮\n`;
+
+        // Create Twitter share URL
+        const shareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(
+          shareText
+        )}`;
+
+        // Open in new tab
+        window.open(shareUrl, "_blank", "width=600,height=400");
+      }
+
+      function restartGame() {
+        // Reset game state
+        cash = 10000;
+        shares = 0;
+        price = 100;
+        history = [price];
+        trades = [];
+        timeIndex = 0;
+        logPrice = Math.log(price);
+        variance = Math.pow(0.8, 2);
+        regime = "bull";
+        timeRemaining = GAME_DURATION_SECONDS;
+        gameActive = true;
+
+        // Reset candlestick data
+        candlesticks = [];
+        currentCandle = {
+          open: price,
+          high: price,
+          low: price,
+          close: price,
+          time: 0,
+        };
+
+        // Clear intervals
+        clearInterval(timerInterval);
+
+        // Hide results modal, show game screen
+        document.getElementById("resultsModal").classList.add("hidden");
+        document.getElementById("gameScreen").classList.remove("hidden");
+
+        // Restart game
+        updateUI();
+        updateTimer();
+        timerInterval = setInterval(() => {
+          timeRemaining--;
+          updateTimer();
+        }, 1000);
+        setInterval(tick, 500);
+      }
+
+      // Generate OG Image for social sharing
+      function generateOGImage() {
+        const canvas = document.createElement("canvas");
+        canvas.width = 1200;
+        canvas.height = 630;
+        const ctx = canvas.getContext("2d");
+
+        // Background gradient
+        const gradient = ctx.createLinearGradient(0, 0, 1200, 630);
+        gradient.addColorStop(0, "#0f0f23");
+        gradient.addColorStop(0.5, "#1a1a2e");
+        gradient.addColorStop(1, "#16213e");
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, 1200, 630);
+
+        // Title
+        ctx.fillStyle = "#ffffff";
+        ctx.font = "bold 72px Inter, sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillText("TradeGame", 600, 200);
+
+        // Subtitle
+        ctx.fillStyle = "#9ca3af";
+        ctx.font = "32px Inter, sans-serif";
+        ctx.fillText("Fun Trading Game", 600, 250);
+
+        // Features
+        ctx.fillStyle = "#00d4aa";
+        ctx.font = "28px Inter, sans-serif";
+        ctx.fillText("⚡ 3-Minute Trading Sessions", 300, 350);
+        ctx.fillText("📊 Exciting Market Dynamics", 900, 350);
+        ctx.fillText("🎯 Challenge Your Friends", 300, 420);
+        ctx.fillText("💎 Cool Interface", 900, 420);
+
+        // Call to action
+        ctx.fillStyle = "#3b82f6";
+        ctx.font = "bold 36px Inter, sans-serif";
+        ctx.fillText("Can you beat the market?", 600, 520);
+
+        return canvas.toDataURL("image/png");
+      }
+
+      // Set OG image when page loads
+      window.addEventListener("load", function () {
+        const ogImage = generateOGImage();
+        // Update meta tags with the generated image
+        const ogImageMeta = document.querySelector('meta[property="og:image"]');
+        const twitterImageMeta = document.querySelector(
+          'meta[property="twitter:image"]'
+        );
+        if (ogImageMeta) ogImageMeta.content = ogImage;
+        if (twitterImageMeta) twitterImageMeta.content = ogImage;
+        // Kick off global winners stats fetch + animation
+        fetchGlobalWinnersStats();
+      });
+
+      // Handle window resize for responsive chart
+      window.addEventListener("resize", function () {
+        if (gameActive) {
+          drawChart();
+        }
+      });
+
+      // Initialize the start screen (no auto-start)
+      updateUI();
+    </script>
+  </body>
+</html>
